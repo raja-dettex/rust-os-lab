@@ -24,13 +24,11 @@ impl GlobalBumpAllocator {
         }
     }
 
-    pub fn ensure_init(&self) { 
+    pub fn ensure_init(&self,heap_addr: usize,end: usize) { 
         if self.start.load(Ordering::Acquire) != 0 { 
             return;
         }
 
-        let heap_addr = unsafe { &raw mut GLOBAL_HEAP as *mut _ as usize};
-        let end = heap_addr + HEAP_SIZE;
         match self.start.compare_exchange(0, heap_addr, Ordering::AcqRel, Ordering::Acquire) {
             Ok(_) => { 
                 self.end.store(end, Ordering::Release);
@@ -45,7 +43,9 @@ impl GlobalBumpAllocator {
     }
 
     pub fn try_alloc(&self, layout: Layout) -> Option<NonNull<u8>> {
-        self.ensure_init();
+        let heap_start = self.start.load(Ordering::Acquire);
+        let heap_end = self.start.load(Ordering::Acquire);
+        self.ensure_init(heap_start, heap_end);
         let align = layout.align();
         let size = layout.size();
         loop {
@@ -81,19 +81,19 @@ impl GlobalBumpAllocator {
 }
 
 
-#[global_allocator]
+//#[global_allocator]
 pub static GLOBAL_BUMP_ALLOCATOR : GlobalBumpAllocator = GlobalBumpAllocator::new_const();
 
-unsafe impl GlobalAlloc for GlobalBumpAllocator {
-    unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        match self.try_alloc(layout) {
-            Some(ptr) => return ptr.as_ptr(),
-            None=> core::ptr::null_mut()
-        }
-    }
+// unsafe impl GlobalAlloc for GlobalBumpAllocator {
+//     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
+//         match self.try_alloc(layout) {
+//             Some(ptr) => return ptr.as_ptr(),
+//             None=> core::ptr::null_mut()
+//         }
+//     }
 
-    unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
-        //
-    }
-}
+//     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
+//         //
+//     }
+// }
 

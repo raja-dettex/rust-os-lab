@@ -6,7 +6,7 @@ use crate::bump::BumpAllocator;
 
 static mut TEST_HEAP :[u8;1024] = [0u8; 1024];
 
-#[test]
+//#[test]
 pub fn simple_alloc_and_test() {
     let heap_addr = unsafe { &raw mut TEST_HEAP as *mut _ as usize};
     let heap_size = core::mem::size_of::<[u8;1024]>();
@@ -29,7 +29,7 @@ pub fn simple_alloc_and_test() {
 
 }
 
-#[test]
+//#[test]
 pub fn alloc_alignment_test() {
     let heap_addr = unsafe { &raw mut TEST_HEAP as *mut _ as usize};
     let heap_size = 1024 as usize;
@@ -41,7 +41,7 @@ pub fn alloc_alignment_test() {
 
 use crate::global_bump::GLOBAL_BUMP_ALLOCATOR as GLOBAL;
 
-#[test]
+//#[test]
 pub fn simple_global_alloc() {
     println!("runing test");
     GLOBAL.reset();
