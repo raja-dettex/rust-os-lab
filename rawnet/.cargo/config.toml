@@ -1,0 +1,8 @@
+[build]
+# optional, not required here
+# rustflags = ["-L", "C:/Users/hp/Downloads/npcap-sdk-1.15/Lib/x64"]
+
+[target.x86_64-pc-windows-msvc]
+rustflags = [
+    "-L", "C:/Users/hp/Downloads/npcap-sdk-1.15/Lib/x64"
+]
